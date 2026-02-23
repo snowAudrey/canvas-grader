@@ -33,7 +33,8 @@ for assignment in assignments:
     print(f"    Published: {assignment.published}")
     print(f"    Submission types: {assignment.submission_types}")
 
-#Step2: Filter assignments
+
+#Step2: filter assignments
 #filter assignments for auto-grading
 print("\n")
 print("="*50)
@@ -60,4 +61,108 @@ for assignment in assignments:
 print("\n\n")
 print(f"Total eligible assignments: {len(eligible_assignments)}")
 
-#Step3: The auto-grading logic
+
+#Step3: auto-grade submissions with confirmation
+print("\n")
+print("="*50)
+print(f"Auto-grading with Confirmation")
+print("="*50)
+
+#First pass: Dry run to see what will be graded
+print(f"\nDry Run - Analyzing submissions...")
+print("="*50)
+
+#store submissions that need grading
+submissions_to_grade = []
+
+for assignment in eligible_assignments:
+    for submission in assignment.get_submissions():
+        #skip if already graded with no late submission
+        if submission.grade is not None:
+            #if students submitted after being graded, re-grade them
+            if submission.submitted_at and submission.graded_at and submission.submitted_at > submission.graded_at:
+                #late submission - needs regrading
+                pass
+            else:
+                #already graded, no late submission - skip
+                continue
+
+        #determine what grade to apply
+        if submission.workflow_state == "unsubmitted":
+            if assignment.grading_type == "pass_fail":
+                grade_to_apply = "incomplete"
+            elif assignment.grading_type == "points":
+                grade_to_apply = 0
+            else:
+                continue
+        else:
+            #student submitted - would give full credit
+            if assignment.grading_type == "pass_fail":
+                grade_to_apply = "complete"
+            elif assignment.grading_type == "points":
+                grade_to_apply = assignment.points_possible
+            else:
+                continue 
+        
+        #store this submission for grading
+        submissions_to_grade.append({
+            "assignment": assignment,
+            "submission": submission,
+            "grade": grade_to_apply
+        })
+
+#show summary
+print("\nSummary of What Will be Graded: ")
+print("="*50)
+
+#group by assignment 
+assignment_counts = {}
+for item in submissions_to_grade:
+    assignment_name = item["assignment"].name
+    if assignment_name not in assignment_counts:
+        assignment_counts[assignment_name] = 0
+    else:
+        assignment_counts[assignment_name] += 1
+
+for assignment_name, count in assignment_counts.items():
+    print(f"    • {assignment_name}: {count} submissions")
+
+print(f"\n  Total: {len(submissions_to_grade)} submission will be graded.")
+print("="*50)
+
+#ask for confirmation
+response = input("\nDo you want to proceed with grading? (yes/no):")
+if response.strip().lower() == "yes":
+    print("\nStarting grading process...")
+    print("="*50)
+
+    graded_count = 0
+    error_count = 0
+
+    for item in submissions_to_grade:
+        assignment = item["assignment"]
+        submission = item["submission"]
+        grade = item["grade"]
+
+        try:
+            submission.edit(submission = {"posted_grade": grade})
+            print(f"   ✓ {assignment.name} - Student {submission.user_id}: {grade}")
+            graded_count += 1
+        except Exception as e:
+            print(f"   ✗ Error = {assignment.name} - Student {submission.user_id}: {e}")
+            error_count += 1
+    
+    print("\n")
+    print("="*50)
+    print(f"Grading Complete")
+    print(f"    ✓ Successfully graded: {graded_count}")
+    if error_count > 0:
+        print(f"    ✗ Errors: {error_count}")
+    print("="*50)
+else:
+    print(f"\nGrading cancelled. No changed were made to Canvas.")
+    print("="*50)
+
+
+
+       
