@@ -1,6 +1,7 @@
 import os
 from dotenv import load_dotenv
 from canvasapi import Canvas
+from datetime import datetime, timezone
 
 #Step1: Canvas API authenticaiton & setup
 
@@ -51,6 +52,13 @@ for assignment in assignments:
     if assignment.submission_types == ["none"]:
         continue
 
+    #skip assignments whose due date has not passed yet
+    if assignment.due_at:
+        due_date = datetime.fromisoformat(assignment.due_at.replace("Z", "+00:00"))
+        now = datetime.now(timezone.utc)
+        if due_date > now:
+            continue
+
     #this assignment is eligible for auto-grading
     eligible_assignments.append(assignment)
     print("\n")
@@ -68,7 +76,7 @@ print("="*50)
 print(f"Auto-grading with Confirmation")
 print("="*50)
 
-#First pass: Dry run to see what will be graded
+#first pass: Dry run to see what will be graded
 print(f"\nDry Run - Analyzing submissions...")
 print("="*50)
 
@@ -132,6 +140,7 @@ print("="*50)
 
 #ask for confirmation
 response = input("\nDo you want to proceed with grading? (yes/no):")
+#second pass: actual grading after typing "yes"
 if response.strip().lower() == "yes":
     print("\nStarting grading process...")
     print("="*50)
