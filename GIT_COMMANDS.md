@@ -12,6 +12,11 @@ git status
 git add .
 ```
 
+Or stage a specific file:
+```bash
+git add filename.py
+```
+
 ### 3. Verify .env is NOT being committed (optional safety check)
 ```bash
 git status
