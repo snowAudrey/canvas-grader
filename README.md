@@ -34,7 +34,7 @@ See "Addressing the Hidden Crisis: The Realities of Faculty Burnout and What Com
 ## Setup Instructions
 
 ### Prerequisites 
-- Python 3.x installed on your computer
+- Python 3.7 installed on your computer
 - A Canvas account with instructor access to a course
 - Canvas API token (see below for how to get one)
 
@@ -124,11 +124,6 @@ See "Addressing the Hidden Crisis: The Realities of Faculty Burnout and What Com
 
 5. **Verify on Canvas**
    - Go to your Canvas course gradebook to confirm grades were applied correctly
-
-## Requirements
-- Python 3.7 or higher
-- Canvas API access (instructor role)
-- Libraries: `canvasapi`, `python-dotenv` (installed via `requirements.txt`)
 
 ## Future Enhancements
 - Add content detection to verify if students submitted meaningful content (not empty documents)
