@@ -128,7 +128,7 @@ assignment_counts = {}
 for item in submissions_to_grade:
     assignment_name = item["assignment"].name
     if assignment_name not in assignment_counts:
-        assignment_counts[assignment_name] = 0
+        assignment_counts[assignment_name] = 1
     else:
         assignment_counts[assignment_name] += 1
 
